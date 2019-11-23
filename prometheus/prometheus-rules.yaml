@@ -46,3 +46,34 @@ data:
         annotations:
           summary: "Instance {{ $labels.instance }} CPU使用率过高"       
           description: "{{ $labels.instance }}CPU使用大于60% (当前值: {{ $value }})"
+  pod.rules: |
+    groups:
+    - name: pod.rules
+      rules:
+      - alert: PodCrash
+        expr: |
+          changes(kube_pod_container_status_restarts_total{job!=""}[3m]) > 0
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Pod Crash"
+          description: "{{$labels.container_label_io_kubernetes_pod_namespace}}/{{$labels.kubernetes_container_name}} Crash!"
+      - alert: PodPending
+        expr: |
+          kube_pod_status_phase{phase!="Failed",phase!="Running",phase!="Succeeded"} == 1 
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Pod Pending"
+          description: "{{$labels.container_label_io_kubernetes_pod_namespace}}/{{$labels.kubernetes_container_name}} Pending!"
+      - alert: PodOOMKilled
+        expr: |
+          changes(kube_pod_container_status_terminated_reason{reason="OOMKilled"}[1m]) > 0 
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Pod OOMKilled"
+          description: "{{$labels.container_label_io_kubernetes_pod_namespace}}/{{$labels.kubernetes_container_name}} OOMKilled!"
