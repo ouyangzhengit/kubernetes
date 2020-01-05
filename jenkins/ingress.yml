@@ -7,7 +7,7 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-body-size: 100m
 spec:
   rules:
-  - host: jenkins.example.com
+  - host: jenkins.ctnrs.com
     http:
       paths:
       - path: /
