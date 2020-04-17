@@ -1,3 +1,6 @@
+    
+# Warning: This is a file generated from the base underscore template file: coredns.yaml.base
+
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -60,6 +63,7 @@ metadata:
 data:
   Corefile: |
     .:53 {
+        log
         errors
         health {
             lameduck 5s
@@ -113,14 +117,14 @@ spec:
         - key: "CriticalAddonsOnly"
           operator: "Exists"
       nodeSelector:
-        beta.kubernetes.io/os: linux
+        kubernetes.io/os: linux
       containers:
       - name: coredns
-        image: coredns/coredns:1.6.5
+        image: lizhenliang/coredns:1.6.7
         imagePullPolicy: IfNotPresent
         resources:
           limits:
-            memory: 1Gi
+            memory: 512Mi 
           requests:
             cpu: 100m
             memory: 70Mi
@@ -186,7 +190,7 @@ metadata:
 spec:
   selector:
     k8s-app: kube-dns
-  clusterIP: 10.0.0.2
+  clusterIP: 10.0.0.2 
   ports:
   - name: dns
     port: 53
