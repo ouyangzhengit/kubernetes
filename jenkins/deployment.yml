@@ -1,14 +1,11 @@
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment 
 metadata:
   name: jenkins
   labels:
     name: jenkins
 spec:
-  serviceName: jenkins
   replicas: 1
-  updateStrategy:
-    type: RollingUpdate
   selector:
     matchLabels:
       name: jenkins 
@@ -22,7 +19,7 @@ spec:
       serviceAccountName: jenkins
       containers:
         - name: jenkins
-          image: jenkins/jenkins:lts-alpine
+          image: jenkins/jenkins:lts 
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
@@ -61,12 +58,18 @@ spec:
             failureThreshold: 12
       securityContext:
         fsGroup: 1000
-  volumeClaimTemplates:
-  - metadata:
-      name: jenkins-home
-    spec:
-      storageClassName: "managed-nfs-storage"
-      accessModes: [ "ReadWriteOnce" ]
-      resources:
-        requests:
-          storage: 1Gi
+      volumes:
+        - name: jenkins-home
+          persistentVolumeClaim:
+            claimName: jenkins-home
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jenkins-home
+spec:
+  storageClassName: "managed-nfs-storage"
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 5Gi
